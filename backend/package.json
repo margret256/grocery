@@ -1,0 +1,24 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "GROCERY-BUDDY",
+  "homepage": "https://github.com/margret256/grocery#readme",
+  "bugs": {
+    "url": "https://github.com/margret256/grocery/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/margret256/grocery.git"
+  },
+  "license": "ISC",
+  "author": "MARGRET NANYONGA",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  }
+}
