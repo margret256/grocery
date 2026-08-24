@@ -15,7 +15,7 @@ exports.registerUser = async (req, res) => {
   }
 
   try {
-    const userExists = await User.findOne({ $or: [{ email }, { username }] })
+    const userExists = await User.findByEmailOrUsername(email, username)
     if (userExists) {
       return res.status(400).json({ message: 'User already exists' })
     }
@@ -37,10 +37,15 @@ exports.registerUser = async (req, res) => {
 
 // LOGIN
 exports.loginUser = async (req, res) => {
-  const { email, password } = req.body
+  const { email, username, password } = req.body
+  const login = email || username
+
+  if (!login || !password) {
+    return res.status(400).json({ message: 'All fields are required' })
+  }
 
   try {
-    const user = await User.findOne({ email })
+    const user = await User.findByLogin(login)
     if (!user) {
       return res.status(400).json({ message: 'Invalid credentials' })
     }
@@ -51,7 +56,7 @@ exports.loginUser = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { id: user._id },
+      { id: user.id },
       process.env.JWT_SECRET,
       { expiresIn: '1d' }
     )
@@ -59,7 +64,7 @@ exports.loginUser = async (req, res) => {
     res.json({
       token,
       user: {
-        id: user._id,
+        id: user.id,
         username: user.username,
         email: user.email
       }
