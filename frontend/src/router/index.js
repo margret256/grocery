@@ -1,13 +1,14 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Login from '../pages/login.vue'
-import Register from '../pages/register.vue'
+import Home from '../pages/Home.vue'
+import Auth from '../pages/Auth.vue'
 import GroceryList from '../pages/GroceryList.vue'
 
 const router = createRouter({
   history: createWebHistory(),
   routes: [
-    { path: '/', component: Login },
-    { path: '/register', component: Register },
+    { path: '/', component: Home },
+    { path: '/login', component: Auth },
+    { path: '/register', component: Auth },
     {
       path: '/groceries',
       component: GroceryList,
@@ -18,9 +19,8 @@ const router = createRouter({
 
 router.beforeEach((to, _, next) => {
   const token = localStorage.getItem('token')
-  if (to.meta.requiresAuth && !token) next('/')
+  if (to.meta.requiresAuth && !token) next('/login')
   else next()
 })
 
 export default router
-
