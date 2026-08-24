@@ -1,46 +1,65 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
 
+const API_URL = 'http://localhost:5000/api'
+
+const authHeaders = () => ({
+  Authorization: `Bearer ${localStorage.getItem('token')}`
+})
+
 export const useGroceryStore = defineStore('grocery', {
   state: () => ({
-    items: []
+    items: [],
+    loading: false
   }),
 
   actions: {
-    async fetchItems() {
-      const res = await axios.get('http://localhost:5000/api/groceries', {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
-      })
-      this.items = res.data
+    async fetchItems(filter = 'all') {
+      this.loading = true
+      try {
+        const res = await axios.get(`${API_URL}/groceries`, {
+          params: { filter },
+          headers: authHeaders()
+        })
+        this.items = res.data
+      } finally {
+        this.loading = false
+      }
     },
 
-    async addItem(item) {
-      await axios.post('http://localhost:5000/api/groceries', item, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
+    async addItem(item, filter = 'all') {
+      await axios.post(`${API_URL}/groceries`, item, {
+        headers: authHeaders()
       })
-      this.fetchItems()
+      await this.fetchItems(filter)
     },
 
-    async updateItem(id, data) {
-      await axios.put(`http://localhost:5000/api/groceries/${id}`, data, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
+    async updateItem(id, data, filter = 'all') {
+      await axios.put(`${API_URL}/groceries/${id}`, data, {
+        headers: authHeaders()
       })
-      this.fetchItems()
+      await this.fetchItems(filter)
     },
 
-    async deleteItem(id) {
-      await axios.delete(`http://localhost:5000/api/groceries/${id}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
+    async deleteItem(id, filter = 'all') {
+      await axios.delete(`${API_URL}/groceries/${id}`, {
+        headers: authHeaders()
       })
-      this.fetchItems()
+      await this.fetchItems(filter)
+    },
+
+    async clearCompleted(filter = 'all') {
+      await axios.delete(`${API_URL}/groceries/clear/completed`, {
+        headers: authHeaders()
+      })
+      await this.fetchItems(filter)
+    },
+
+    async clearAll(filter = 'all') {
+      await axios.delete(`${API_URL}/groceries`, {
+        headers: authHeaders()
+      })
+      await this.fetchItems(filter)
     }
   }
 })
